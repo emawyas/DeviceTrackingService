@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DeviceTrackingService.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -16,7 +17,16 @@ namespace DeviceTrackingService
         [WebInvoke(Method = "GET",
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
-            UriTemplate = "json/{id}")]
-        string JSONData(string id);
+            UriTemplate = "allDevices/")]
+        TrackingDevice[] allDevices();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "devices/{deviceSerial}")]
+        TrackingDevice getDevice(string deviceSerial);
+
+
     }
 }
