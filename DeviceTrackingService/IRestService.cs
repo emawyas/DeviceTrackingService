@@ -27,6 +27,20 @@ namespace DeviceTrackingService
             UriTemplate = "devices/{deviceSerial}")]
         TrackingDevice getDevice(string deviceSerial);
 
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+                    RequestFormat = WebMessageFormat.Json,
+                    ResponseFormat = WebMessageFormat.Json,
+                    UriTemplate = "addDevice")]
+        void addDevice(TrackingDevice device);
+
+        [OperationContract]
+        [WebInvoke(Method = "PUT",
+                    RequestFormat = WebMessageFormat.Json,
+                    ResponseFormat = WebMessageFormat.Json,
+                    UriTemplate = "updateDevice")]
+        int updateDevice(TrackingDevice device);
+
 
     }
 }

@@ -9,31 +9,34 @@ namespace DeviceTrackingService.Models
     [DataContract(Namespace = "")]
     public class TrackingDevice
     {
-        [DataMember]
+        [DataMember (Name = "DriverId")]
         public string driverId { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "MaxSpeed")]
         public int maxSpeed { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "DeviceSerial")]
         public string deviceSerial { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "FirmWareVersion")]
         public string firmWareVersion { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "latitude")]
         public double latitude { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "longitude")]
         public double longitude { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "heading")]
         public string heading { get; set; }
 
-        [DataMember]
+        [DataMember(Name ="EW")]
         public string EW { get; set; }
 
-        [DataMember]
+        [DataMember(Name = "NS")]
         public string NS { get; set; }
+
+        [DataMember(Name = "GpsDateTime")]
+        public DateTime UpdateTime { get; set; }
     }
 }
