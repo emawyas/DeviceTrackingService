@@ -67,7 +67,7 @@ namespace DeviceTrackingService
                         TD.longitude = float.Parse(reader["Longitude"].ToString());
                         TD.NS = reader["NS"].ToString();
                         TD.heading = reader["Heading"].ToString();
-                        TD.UpdateTime = Convert.ToDateTime(reader["UpdateTime"].ToString());
+                        //TD.GpsDateTime = Convert.ToDateTime(reader["UpdateTime"].ToString());
                         allTds.Add(TD);
                     }
                 }
@@ -76,27 +76,29 @@ namespace DeviceTrackingService
             return allTds.ToArray();
         }
 
-        public void addDevice(TrackingDevice device)
+        public int addDevice(TrackingDevice device)
         {
             Debug.WriteLine("Received POST request");
             string connectionString = System.Configuration.ConfigurationManager.
                                     ConnectionStrings["DTSDB"].ConnectionString;
-            string values = "(@Id, @DriverId, @MaxSpeed, @DeviceSerial, @FirmWareVersion, @Latitude, @longitude,@EW,@NS,@Heading,@UpdateTime)";
+            string values = "(@DriverId, @MaxSpeed, @DeviceSerial, @FirmWareVersion, @Latitude, @longitude,@EW,@NS,@Heading,@UpdateTime)";
             int result = 0;
-
-            //Check if the device exists
-            int recordCout = (int)new SqlCommand("SELECT COUNT(*) from dbo.DeviceMaster where DeviceSerial = " + 
-                                                device.deviceSerial).ExecuteScalar();
-
-            if (recordCout > 0)
-                return;
 
             //insert in the DB
             using (SqlConnection connection = new SqlConnection(connectionString))
             using (SqlCommand command = new SqlCommand("insert into dbo.DeviceMaster values " + values, connection))
             {
                 connection.Open();
-                command.Parameters.AddWithValue("@Id", getCurrId(connectionString)+1);
+                //Check if the device exists
+                int recordCout = (int)new SqlCommand("SELECT COUNT(*) from dbo.DeviceMaster where DeviceSerial = '" +
+                                                    device.deviceSerial+"'", connection).ExecuteScalar();
+                if (recordCout > 0)
+                {
+                    connection.Close();
+                    return result;
+                }
+                Debug.WriteLine("RestService: Posting to DB");
+                //command.Parameters.AddWithValue("@Id", getCurrId(connectionString)+1);
                 command.Parameters.AddWithValue("@DriverId", device.driverId);
                 command.Parameters.AddWithValue("@MaxSpeed", device.maxSpeed);
                 command.Parameters.AddWithValue("@DeviceSerial", device.deviceSerial);
@@ -106,43 +108,48 @@ namespace DeviceTrackingService
                 command.Parameters.AddWithValue("@EW", device.EW);
                 command.Parameters.AddWithValue("@NS", device.NS);
                 command.Parameters.AddWithValue("@Heading", device.heading);
-                command.Parameters.AddWithValue("@UpdateTime", device.UpdateTime);
+                command.Parameters.AddWithValue("@UpdateTime", Convert.ToDateTime(device.GpsDateTime));
                 result = command.ExecuteNonQuery();
                 Debug.WriteLine("Result = " + result);
                 connection.Close();
             }
-            //return result;
+            return result;
         }
 
         public int updateDevice(TrackingDevice device)
         {
+            Debug.WriteLine("RestService: Received PUT request");
             string connectionString = System.Configuration.ConfigurationManager.
                         ConnectionStrings["DTSDB"].ConnectionString;
             string values = "(@Latitude, @longitude,@EW,@NS,@Heading,@UpdateTime)";
             int result = 0;
 
-            //Check if the device exists
-            int recordCout = (int)new SqlCommand("SELECT COUNT(*) from dbo.DeviceMaster where DeviceSerial = " +
-                                                device.deviceSerial).ExecuteScalar();
-
-            if (recordCout == 0)
-                return 0;
-
-            //insert in the DB
+            //update the DB
             using (SqlConnection connection = new SqlConnection(connectionString))
-            using (SqlCommand command = 
+            using (SqlCommand command =
                             new SqlCommand("update dbo.DeviceMaster(Latitude, Longitude, EW, NS, Heading, UpdateTime) values "
-                                            + values + " where DeviceSerial = " + device.deviceSerial, connection))
+                                            + values + " where DeviceSerial = '" + device.deviceSerial+"'", connection))
             {
                 connection.Open();
+
+                //Check if the device exists
+                int recordCout = (int)new SqlCommand("SELECT COUNT(*) from dbo.DeviceMaster where DeviceSerial = '" +
+                                                    device.deviceSerial + "'", connection).ExecuteScalar();
+
+                if (recordCout == 0)
+                {
+                    connection.Close();
+                    return 0;
+                }
+
+                Debug.WriteLine("RestService: updating DB");
                 command.Parameters.AddWithValue("@Latitude", (float)device.latitude);
                 command.Parameters.AddWithValue("@Longitude", (float)device.longitude);
                 command.Parameters.AddWithValue("@EW", device.EW);
                 command.Parameters.AddWithValue("@NS", device.NS);
                 command.Parameters.AddWithValue("@Heading", device.heading);
-                command.Parameters.AddWithValue("@UpdateTime", device.UpdateTime);
+                command.Parameters.AddWithValue("@UpdateTime", Convert.ToDateTime(device.GpsDateTime));
                 result = command.ExecuteNonQuery();
-                Debug.WriteLine("Result = " + result);
                 connection.Close();
             }
             return result;
@@ -152,7 +159,7 @@ namespace DeviceTrackingService
         {
             int result = 0;
             using (SqlConnection connection = new SqlConnection(connectionString))
-            using (SqlCommand command = new SqlCommand("select top 1 Id from dbo.TrackingDeviceMaster ORDER BY Id DESC" , connection))
+            using (SqlCommand command = new SqlCommand("select top 1 Id from dbo.DeviceMaster ORDER BY Id DESC" , connection))
             {
                 connection.Open();
                 using (SqlDataReader reader = command.ExecuteReader())

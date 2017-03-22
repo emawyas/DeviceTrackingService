@@ -37,6 +37,6 @@ namespace DeviceTrackingService.Models
         public string NS { get; set; }
 
         [DataMember(Name = "GpsDateTime")]
-        public DateTime UpdateTime { get; set; }
+        public string GpsDateTime { get; set; }
     }
 }

@@ -31,8 +31,9 @@ namespace DeviceTrackingService
         [WebInvoke(Method = "POST",
                     RequestFormat = WebMessageFormat.Json,
                     ResponseFormat = WebMessageFormat.Json,
+                    BodyStyle = WebMessageBodyStyle.Bare,
                     UriTemplate = "addDevice")]
-        void addDevice(TrackingDevice device);
+        int addDevice(TrackingDevice device);
 
         [OperationContract]
         [WebInvoke(Method = "PUT",
