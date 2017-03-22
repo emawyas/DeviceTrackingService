@@ -38,5 +38,8 @@ namespace DeviceTrackingService.Models
 
         [DataMember(Name = "GpsDateTime")]
         public string GpsDateTime { get; set; }
+
+        [DataMember(Name = "Speed")]
+        public int Speed { get; set; }
     }
 }

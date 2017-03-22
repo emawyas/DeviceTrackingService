@@ -81,7 +81,7 @@ namespace DeviceTrackingService
             Debug.WriteLine("Received POST request");
             string connectionString = System.Configuration.ConfigurationManager.
                                     ConnectionStrings["DTSDB"].ConnectionString;
-            string values = "(@DriverId, @MaxSpeed, @DeviceSerial, @FirmWareVersion, @Latitude, @longitude,@EW,@NS,@Heading,@UpdateTime)";
+            string values = "(@DriverId, @MaxSpeed, @DeviceSerial, @FirmWareVersion,@Speed, @Latitude, @longitude,@EW,@NS,@Heading,@UpdateTime)";
             int result = 0;
 
             //insert in the DB
@@ -103,6 +103,7 @@ namespace DeviceTrackingService
                 command.Parameters.AddWithValue("@MaxSpeed", device.maxSpeed);
                 command.Parameters.AddWithValue("@DeviceSerial", device.deviceSerial);
                 command.Parameters.AddWithValue("@FirmWareVersion", device.firmWareVersion);
+                command.Parameters.AddWithValue("@Speed", device.Speed);
                 command.Parameters.AddWithValue("@Latitude", (float)device.latitude);
                 command.Parameters.AddWithValue("@Longitude", (float)device.longitude);
                 command.Parameters.AddWithValue("@EW", device.EW);
@@ -118,17 +119,17 @@ namespace DeviceTrackingService
 
         public int updateDevice(TrackingDevice device)
         {
-            Debug.WriteLine("RestService: Received PUT request");
+            Debug.WriteLine("RestService: Received PUT request " + device.Speed);
             string connectionString = System.Configuration.ConfigurationManager.
                         ConnectionStrings["DTSDB"].ConnectionString;
-            string values = "(@Latitude, @longitude,@EW,@NS,@Heading,@UpdateTime)";
+            string values = "Speed = @Speed, Latitude = @Latitude, Longitude =  @longitude, EW = @EW, NS = @NS, Heading = @Heading, UpdateTime = @UpdateTime";
             int result = 0;
 
             //update the DB
             using (SqlConnection connection = new SqlConnection(connectionString))
             using (SqlCommand command =
-                            new SqlCommand("update dbo.DeviceMaster(Latitude, Longitude, EW, NS, Heading, UpdateTime) values "
-                                            + values + " where DeviceSerial = '" + device.deviceSerial+"'", connection))
+                            new SqlCommand("update dbo.DeviceMaster SET " + values + " where DeviceSerial = '" 
+                            + device.deviceSerial+"'", connection))
             {
                 connection.Open();
 
@@ -143,6 +144,7 @@ namespace DeviceTrackingService
                 }
 
                 Debug.WriteLine("RestService: updating DB");
+                command.Parameters.AddWithValue("@Speed", device.Speed);
                 command.Parameters.AddWithValue("@Latitude", (float)device.latitude);
                 command.Parameters.AddWithValue("@Longitude", (float)device.longitude);
                 command.Parameters.AddWithValue("@EW", device.EW);
@@ -150,23 +152,6 @@ namespace DeviceTrackingService
                 command.Parameters.AddWithValue("@Heading", device.heading);
                 command.Parameters.AddWithValue("@UpdateTime", Convert.ToDateTime(device.GpsDateTime));
                 result = command.ExecuteNonQuery();
-                connection.Close();
-            }
-            return result;
-        }
-
-        private int getCurrId(string connectionString)
-        {
-            int result = 0;
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            using (SqlCommand command = new SqlCommand("select top 1 Id from dbo.DeviceMaster ORDER BY Id DESC" , connection))
-            {
-                connection.Open();
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                        result = Int32.Parse(reader["id"].ToString());
-                }
                 connection.Close();
             }
             return result;
