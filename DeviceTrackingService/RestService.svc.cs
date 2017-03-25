@@ -80,8 +80,8 @@ namespace DeviceTrackingService
         {
             Debug.WriteLine("Received POST request");
             string connectionString = System.Configuration.ConfigurationManager.
-                                    ConnectionStrings["DTSDB"].ConnectionString;
-            string values = "(@DriverId, @MaxSpeed, @DeviceSerial, @FirmWareVersion,@Speed, @Latitude, @longitude,@EW,@NS,@Heading,@UpdateTime)";
+                                    ConnectionStrings["DTSDB-Home"].ConnectionString;
+            string values = "(@DriverId, @MaxSpeed, @DeviceSerial, @FirmWareVersion,@Speed, @Latitude, @longitude,@EW,@NS,@Heading,@UpdateTime,@CompleteRoute,@StartCoords,@EndCoords)";
             int result = 0;
 
             //insert in the DB
@@ -110,6 +110,9 @@ namespace DeviceTrackingService
                 command.Parameters.AddWithValue("@NS", device.NS);
                 command.Parameters.AddWithValue("@Heading", device.heading);
                 command.Parameters.AddWithValue("@UpdateTime", Convert.ToDateTime(device.GpsDateTime));
+                command.Parameters.AddWithValue("@CompleteRoute", device.CompleteRoute);
+                command.Parameters.AddWithValue("@StartCoords", device.Source);
+                command.Parameters.AddWithValue("@EndCoords", device.Destination);
                 result = command.ExecuteNonQuery();
                 Debug.WriteLine("Result = " + result);
                 connection.Close();
@@ -121,8 +124,9 @@ namespace DeviceTrackingService
         {
             Debug.WriteLine("RestService: Received PUT request " + device.Speed);
             string connectionString = System.Configuration.ConfigurationManager.
-                        ConnectionStrings["DTSDB"].ConnectionString;
-            string values = "Speed = @Speed, Latitude = @Latitude, Longitude =  @longitude, EW = @EW, NS = @NS, Heading = @Heading, UpdateTime = @UpdateTime";
+                        ConnectionStrings["DTSDB-Home"].ConnectionString;
+            string values = "Speed = @Speed, Latitude = @Latitude, Longitude =  @longitude, EW = @EW, NS = @NS, Heading = @Heading, UpdateTime = @UpdateTime," + 
+                            "CompleteRoute = @CompleteRoute, StartCoords = @StartCoords, EndCoords = @EndCoords";
             int result = 0;
 
             //update the DB
@@ -151,6 +155,9 @@ namespace DeviceTrackingService
                 command.Parameters.AddWithValue("@NS", device.NS);
                 command.Parameters.AddWithValue("@Heading", device.heading);
                 command.Parameters.AddWithValue("@UpdateTime", Convert.ToDateTime(device.GpsDateTime));
+                command.Parameters.AddWithValue("@CompleteRoute", device.CompleteRoute);
+                command.Parameters.AddWithValue("@StartCoords", device.Source);
+                command.Parameters.AddWithValue("@EndCoords", device.Destination);
                 result = command.ExecuteNonQuery();
                 connection.Close();
             }

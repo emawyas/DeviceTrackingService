@@ -89,14 +89,19 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="RestService.svc" />
+    <Content Include="WCFService.svc" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IWCFService.cs" />
     <Compile Include="Models\TrackingDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IRestService.cs" />
     <Compile Include="RestService.svc.cs">
       <DependentUpon>RestService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="WCFService.svc.cs">
+      <DependentUpon>WCFService.svc</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

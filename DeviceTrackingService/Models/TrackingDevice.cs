@@ -41,5 +41,15 @@ namespace DeviceTrackingService.Models
 
         [DataMember(Name = "Speed")]
         public int Speed { get; set; }
+
+        [DataMember(Name = "CompleteRoute")]
+        public string CompleteRoute { get; set; }
+
+        [DataMember(Name ="Source")]
+        public string Source { get; set; }
+
+        [DataMember(Name ="Destination")]
+        public string Destination { get; set; }
+
     }
 }
