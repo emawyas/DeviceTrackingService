@@ -41,6 +41,7 @@ namespace DeviceTrackingService
                         TD.CompleteRoute = reader["CompleteRoute"].ToString();
                         TD.Source = reader["StartCoords"].ToString();
                         TD.Destination = reader["EndCoords"].ToString();
+                        TD.Speed = Int32.Parse(reader["Speed"].ToString());
                         allTds.Add(TD);
                     }
                 }
@@ -75,6 +76,7 @@ namespace DeviceTrackingService
                         TD.CompleteRoute = reader["CompleteRoute"].ToString();
                         TD.Source = reader["StartCoords"].ToString();
                         TD.Destination = reader["EndCoords"].ToString();
+                        TD.Speed = Int32.Parse(reader["Speed"].ToString());
                     }
                 }
                 connection.Close();
